@@ -1,0 +1,125 @@
+---
+title: "Self-learning for Chapter 3- Data Visualization"
+output: 
+  github_document:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(knitr)
+
+theme_set(theme_light())
+
+opts_chunk$set(
+  cache = TRUE,
+  message = FALSE, 
+  warning = FALSE, 
+  fig.width = 10, 
+  fig.height = 7
+  )
+
+```
+
+
+```{r, message=FALSE}
+
+air_incidents <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/airline-safety/airline-safety.csv") 
+
+```
+
+# Basic scatterplot
+```{r}
+
+air_incidents %>% 
+  ggplot(aes(fatal_accidents_85_99, fatalities_85_99)) +
+  geom_point()
+
+```
+  
+# Plot an aesthetic corresponding to another variable.
+```{r}
+
+air_incidents %>% 
+  ggplot(aes(fatal_accidents_85_99, fatalities_85_99, size = avail_seat_km_per_week)) +
+  geom_point()
+
+```
+  
+# Plot a manual aesthetic
+```{r}
+
+air_incidents %>% 
+  ggplot(aes(fatal_accidents_85_99, fatalities_85_99, size = avail_seat_km_per_week)) +
+  geom_point(color = "purple")
+
+```
+
+# Facet by a third variable
+```{r}
+
+air_incidents %>% 
+  filter(airline %in% c("Southwest Airlines",
+                        "Alaska Airlines*",
+                        "American*")) %>% 
+  ggplot(aes(avail_seat_km_per_week, fatalities_85_99)) +
+  geom_point() +
+  facet_wrap(~ airline)
+
+```
+
+# Use two different geom()'s
+```{r}
+
+air_incidents %>% 
+  ggplot(aes(incidents_85_99, incidents_00_14)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+```
+
+# Use a geom() that uses stat. transformations
+```{r}
+
+air_incidents %>% 
+  arrange(desc(avail_seat_km_per_week)) %>% 
+  slice(1:5) %>% 
+  ggplot(aes(airline, avail_seat_km_per_week)) +
+  geom_col()
+
+```
+
+This dataset already had precomputed values, but could've used geom_bar() if it was in a more raw data-like form.
+
+# Use a positional adjustment in geom_boxplot()
+```{r}
+
+air_incidents %>% 
+  filter(airline %in% c("American*", "Southwest Airlines", "Air Canada")) %>% 
+  ggplot(aes(airline, avail_seat_km_per_week)) +
+  geom_boxplot(position = "dodge")
+
+```
+
+This would work if data was raw and each row was a flight with that flight's available seats
+
+# Use coord_flip() and coord_polar()
+```{r}
+
+air_incidents %>% 
+  filter(airline %in% c("American*", "Southwest Airlines", "Air Canada")) %>% 
+  ggplot(aes(airline, avail_seat_km_per_week)) +
+  geom_boxplot(position = "dodge") +
+  coord_flip()
+
+```
+
+
+
+
+
+  

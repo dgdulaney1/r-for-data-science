@@ -1,0 +1,272 @@
+---
+title: "Walkthrough for chapter 10- Tibbles"
+subtitle: ""
+output:
+  github_document:
+    toc: true
+allow_html: true
+editor_options:
+  chunk_output_type: console
+fig.width: 10
+fig.height: 7
+---
+
+```{r setup}
+
+library(tidyverse)
+library(here)
+library(knitr)
+
+theme_set(theme_light())
+
+opts_chunk$set(
+  cache = TRUE,
+  message = FALSE, 
+  warning = FALSE, 
+  fig.width = 10, 
+  fig.height = 7
+  )
+
+```
+
+----------
+
+# Creating tibbles
+
+Tibbles are essentially data frames with a few nicer functionalities
+
+as_tibble() is the function that coerces a data frame to a tibble
+```{r}
+
+as_tibble(iris)
+
+```
+
+tibble() can be used to create a new data object type tibble
+```{r}
+
+tibble(
+  x = 1:5,
+  y = 1,
+  z = x^2 + y
+)
+
+```
+
+tibble() does not change the input type (e.g. string --> factor), doesn't change the variable names, and doesn't create row names.
+
+Columns can also be non-syntatic
+```{r}
+
+tibble(
+  `:)` = 1:100,
+  `:(` = 2
+)
+
+```
+
+tribble() is another way to create a tibble and allows for traditional data entry to create a dataset
+```{r}
+
+tribble(
+  ~x, ~y, ~z,
+  
+  "a", 2, 3.6,
+  "b", 1, 8.5
+)
+
+```
+
+----------
+
+# Tibbles vs data.frame
+
+There are two main differences between tibbles and data frames:
+
+- **Printing**
+
+Default prints to 10 rows
+```{r}
+
+as_tibble(iris) %>% print()
+
+iris %>% print()
+
+```
+
+The width = inf option allows to print all columns
+```{r}
+
+print(as_tibble(mpg), n = 15, width = Inf)
+
+```
+
+View() is also great for easily viewing a dataset in the RStudio data viewer
+```{r}
+
+iris %>% View()
+
+```
+
+- **Subsetting**
+
+Extract a column by name using [[]] or $
+```{r}
+
+df <- tibble(
+  y = 1:10,
+  x = letters[1:10],
+  z = rnorm(n = 10)
+)
+
+df$x
+
+df[["x"]]
+
+```
+
+And in a pipe, . is the data set placeholder
+```{r}
+
+df %>% 
+  filter(z < 0) %>% 
+  .$z 
+
+```
+
+----------
+
+# Exercises
+
+
+
+**1. How can you tell if an object is a tibble? (Hint: try printing mtcars, which is a regular data frame).**
+```{r}
+
+print(mtcars)
+
+print(as_tibble(mtcars))
+
+```
+
+Tibble version prints a clean 10 rows only and...it says it's a tibble lol.
+
+
+**2. Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?**
+
+```{r}    
+df <- data.frame(abc = 1, xyz = "a")
+
+str(df)
+
+df$x
+str(df[, "xyz"])
+str(df[, c("abc", "xyz")])
+
+tib <- tibble(
+  abc = 1,
+  xyz = "a"
+)
+
+str(tib)
+
+tib$x
+tib[, "xyz"]
+tib[, c("abc", "xyz")]
+
+```
+
+Advantages of the tibble:
+
+- Does not coerce column xyz to be factor instead of chr (and therefore can't access x through $, a column selector)
+- The bracket subset returns type factor for a single column subset, type data frame for the multi-column. The tibble subset always returns a tibble.
+
+**3. If you have the name of a variable stored in an object, e.g. var <- "mpg", how can you extract the reference variable from a tibble?**
+```{r}
+
+var <- "model"
+
+mpg %>% 
+  select(var)
+
+```
+
+**4. Practice referring to non-syntactic names in the following data frame by:**
+
+```{r}
+
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+  )
+
+```
+
+- Extracting the variable called 1.
+```{r}
+
+annoying %>% select(`1`)
+
+```
+
+- Plotting a scatterplot of 1 vs 2.
+```{r}
+
+annoying %>% 
+  ggplot(aes(`1`, `2`)) +
+  geom_point()
+
+```
+
+- Creating a new column called 3 which is 2 divided by 1.
+```{r}
+
+annoying <- annoying %>% 
+  mutate(`3` = `2` / `1`)
+
+```
+
+- Renaming the columns to one, two and three.
+```{r}
+
+colnames(annoying)
+
+annoying %>% 
+  rename(
+    one = `1`,
+    two = `2`,
+    three = `3`
+  )
+
+```
+
+**5. What does tibble::enframe() do? When might you use it?**
+```{r}
+
+?enframe
+
+```
+
+enframe() & deframe() do converstions:
+
+- **Vectors to data frames**
+```{r}
+
+1:5 %>% enframe()
+
+```
+
+- **Data frames to vectors**
+```{r}
+
+tibble(a = 1:5, b = letters[1:5]) %>% deframe()
+
+```
+
+6. What option controls how many additional column names are printed at the footer of a tibble?
+```{r}
+
+as_tibble(mpg) %>% print()
+
+```
+
