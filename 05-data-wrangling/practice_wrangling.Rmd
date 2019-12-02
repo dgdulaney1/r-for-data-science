@@ -1,0 +1,65 @@
+---
+title: "Practice for Chapter 5- Data Wrangling"
+subtitle: ""
+output:
+  github_document:
+    toc: true
+allow_html: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, message=FALSE, warning=FALSE}
+
+library(tidyverse)
+library(here)
+
+```
+
+```{r}
+
+theme_set(theme_light())
+
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE, 
+  warning = FALSE, 
+  fig.width = 10, 
+  fig.height = 7
+  )
+
+```
+
+Read in Fifa 19 players datset from [Kaggle](https://www.kaggle.com/karangadiya/fifa19#data.csv).
+
+```{r}
+
+fifa_19_players <- read_csv(here("05-data-wrangling", "fifa-19-players.csv"))
+
+```
+
+# filter()
+
+```{r}
+
+fifa_19_players %>% 
+  filter((Overall >= 90 | Potential >= 90) & (between(Age, 20, 25)))
+
+```
+
+# arrange()
+
+
+# select()
+
+
+# mutate()
+
+
+# summarise()
+
+
+# grouped mutate()
+
+
+

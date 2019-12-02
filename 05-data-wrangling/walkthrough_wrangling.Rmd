@@ -1,0 +1,155 @@
+---
+title: "Walkthrough for Chapter 5- Data Wrangling"
+subtitle: ""
+output:
+  github_document:
+    toc: true
+allow_html: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+
+theme_set(theme_light())
+
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE, 
+  warning = FALSE, 
+  fig.width = 10, 
+  fig.height = 7
+  )
+
+```
+
+# Intro
+
+Using `nycflights13::flights` dataset.
+```{r}
+
+flights %>% 
+  head(5)
+
+```
+
+# filter()
+
+Use an `&` filter by just adding multiple conditions.
+```{r}
+
+flights %>% 
+  filter(month == 1, day == 1)
+
+```
+
+Have to assign to actually save the new data frame
+```{r}
+
+dec_25 <- flights %>% filter(month == 12, day == 25)
+
+```
+
+The comparisons to use are `>`, `>=`, `<`, `<=`, `!=`, and `==`
+
+Logical operators like `&` and `|`, and `%in%` are also used.
+```{r}
+
+flights %>% 
+  filter(month %in% c(11, 12))
+
+```
+
+When an `NA` value is involved in a filter, the result will almost always be `NA` as well
+```{r}
+
+NA > 5
+
+```
+
+```{r}
+
+NA + 10
+
+```
+
+These operations make sense when we consider adding a known and an unknown; the result will also be unknown!
+
+## Exercises
+
+1. Find all flights that
+
+- Had an arrival delay of two or more hours
+```{r}
+
+flights %>% 
+  filter(arr_delay <= 120)
+
+```
+
+- Flew to Houston (IAH or HOU)
+```{r}
+
+flights %>% 
+  filter(dest %in% c("IAH", "HOU"))
+
+```
+
+- Departed between midnight and 6am (inclusive)
+```{r}
+
+flights %>% 
+  filter(dep_time >= 0 & dep_time <= 600)
+
+```
+
+2. Another useful dplyr filtering helper is between(). What does it do? Can you use it to simplify the code needed to answer the previous challenges?
+```{r}
+
+flights %>% 
+  filter(between(dep_time, 0, 600))
+
+```
+
+3. How many flights have a missing dep_time? What other variables are missing? What might these rows represent?
+```{r}
+
+flights %>% 
+  filter(is.na(dep_time))
+
+```
+
+4. Why is NA ^ 0 not missing? Why is NA | TRUE not missing? Why is FALSE & NA not missing? Can you figure out the general rule? (NA * 0 is a tricky counterexample!)
+```{r}
+
+NA ^ 0 # anything to the 0th power equals 1
+
+```
+
+```{r}
+
+NA | TRUE # anything or TRUE has to be TRUE
+
+```
+
+```{r}
+
+FALSE & NA # anything and false has to be FALSE
+
+```
+
+# arrange()
+
+
+# select()
+
+
+# mutate()
+
+
+# summarise()
+
+
+# grouped mutate (and filters)
