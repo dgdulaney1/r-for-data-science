@@ -5,7 +5,9 @@ Walkthrough for Chapter 5- Data Wrangling
   - [filter()](#filter)
       - [Exercises](#exercises)
   - [arrange()](#arrange)
+      - [Exercises](#exercises-1)
   - [select()](#select)
+      - [Exercises](#exercises-2)
   - [mutate()](#mutate)
   - [summarise()](#summarise)
   - [grouped mutate (and filters)](#grouped-mutate-and-filters)
@@ -31,7 +33,7 @@ library(nycflights13)
 theme_set(theme_light())
 
 knitr::opts_chunk$set(
-  cache = TRUE,
+  cache = FALSE,
   message = FALSE, 
   warning = FALSE, 
   fig.width = 10, 
@@ -301,7 +303,225 @@ FALSE & NA # anything and false has to be FALSE
 
 # arrange()
 
+`arrange()` allows us to order rows based on values.
+
+``` r
+flights %>% 
+  arrange(year)
+```
+
+    ## # A tibble: 336,776 x 19
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+    ##  1  2013     1     1      517            515         2      830            819
+    ##  2  2013     1     1      533            529         4      850            830
+    ##  3  2013     1     1      542            540         2      923            850
+    ##  4  2013     1     1      544            545        -1     1004           1022
+    ##  5  2013     1     1      554            600        -6      812            837
+    ##  6  2013     1     1      554            558        -4      740            728
+    ##  7  2013     1     1      555            600        -5      913            854
+    ##  8  2013     1     1      557            600        -3      709            723
+    ##  9  2013     1     1      557            600        -3      838            846
+    ## 10  2013     1     1      558            600        -2      753            745
+    ## # ... with 336,766 more rows, and 11 more variables: arr_delay <dbl>,
+    ## #   carrier <chr>, flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
+    ## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+
+``` r
+flights %>% 
+  arrange(year, month, day)
+```
+
+    ## # A tibble: 336,776 x 19
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+    ##  1  2013     1     1      517            515         2      830            819
+    ##  2  2013     1     1      533            529         4      850            830
+    ##  3  2013     1     1      542            540         2      923            850
+    ##  4  2013     1     1      544            545        -1     1004           1022
+    ##  5  2013     1     1      554            600        -6      812            837
+    ##  6  2013     1     1      554            558        -4      740            728
+    ##  7  2013     1     1      555            600        -5      913            854
+    ##  8  2013     1     1      557            600        -3      709            723
+    ##  9  2013     1     1      557            600        -3      838            846
+    ## 10  2013     1     1      558            600        -2      753            745
+    ## # ... with 336,766 more rows, and 11 more variables: arr_delay <dbl>,
+    ## #   carrier <chr>, flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
+    ## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+
+Use `desc()` to sort in…descending order\!
+
+``` r
+flights %>% 
+  arrange(desc(month))
+```
+
+    ## # A tibble: 336,776 x 19
+    ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+    ##  1  2013    12     1       13           2359        14      446            445
+    ##  2  2013    12     1       17           2359        18      443            437
+    ##  3  2013    12     1      453            500        -7      636            651
+    ##  4  2013    12     1      520            515         5      749            808
+    ##  5  2013    12     1      536            540        -4      845            850
+    ##  6  2013    12     1      540            550       -10     1005           1027
+    ##  7  2013    12     1      541            545        -4      734            755
+    ##  8  2013    12     1      546            545         1      826            835
+    ##  9  2013    12     1      549            600       -11      648            659
+    ## 10  2013    12     1      550            600       -10      825            854
+    ## # ... with 336,766 more rows, and 11 more variables: arr_delay <dbl>,
+    ## #   carrier <chr>, flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
+    ## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+
+Missing values are always sorted to the end
+
+``` r
+tibble(x = c(1:5, NA)) %>% 
+  arrange(x)
+```
+
+    ## # A tibble: 6 x 1
+    ##       x
+    ##   <int>
+    ## 1     1
+    ## 2     2
+    ## 3     3
+    ## 4     4
+    ## 5     5
+    ## 6    NA
+
+## Exercises
+
+1.  How could you use arrange() to sort all missing values to the start?
+    (Hint: use is.na()).
+
+<!-- end list -->
+
+``` r
+tibble(x = c(1:5, NA, 6, NA)) %>% 
+  arrange(desc(is.na(x)))
+```
+
+    ## # A tibble: 8 x 1
+    ##       x
+    ##   <dbl>
+    ## 1    NA
+    ## 2    NA
+    ## 3     1
+    ## 4     2
+    ## 5     3
+    ## 6     4
+    ## 7     5
+    ## 8     6
+
+2.  Sort flights to find the most delayed flights. Find the flights that
+    left earliest.
+
+<!-- end list -->
+
+``` r
+flights %>% 
+  arrange(desc(dep_delay)) %>% 
+  select(dep_delay)
+```
+
+    ## # A tibble: 336,776 x 1
+    ##    dep_delay
+    ##        <dbl>
+    ##  1      1301
+    ##  2      1137
+    ##  3      1126
+    ##  4      1014
+    ##  5      1005
+    ##  6       960
+    ##  7       911
+    ##  8       899
+    ##  9       898
+    ## 10       896
+    ## # ... with 336,766 more rows
+
 # select()
+
+Select columns\!
+
+``` r
+flights %>% 
+  select(year, month, day)
+```
+
+    ## # A tibble: 336,776 x 3
+    ##     year month   day
+    ##    <int> <int> <int>
+    ##  1  2013     1     1
+    ##  2  2013     1     1
+    ##  3  2013     1     1
+    ##  4  2013     1     1
+    ##  5  2013     1     1
+    ##  6  2013     1     1
+    ##  7  2013     1     1
+    ##  8  2013     1     1
+    ##  9  2013     1     1
+    ## 10  2013     1     1
+    ## # ... with 336,766 more rows
+
+Use helper functions like:
+
+  - `starts_with()`
+  - `ends_with()`
+  - `contains()`
+  - `matches()`- reg expressions
+  - `num_range()`- `num_range("x", 1:3)` would reurn x1, x2, x3
+
+`rename()` is a variant of select and returns all columns
+
+``` r
+flights %>% 
+  rename(Year = year)
+```
+
+    ## # A tibble: 336,776 x 19
+    ##     Year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+    ##    <int> <int> <int>    <int>          <int>     <dbl>    <int>          <int>
+    ##  1  2013     1     1      517            515         2      830            819
+    ##  2  2013     1     1      533            529         4      850            830
+    ##  3  2013     1     1      542            540         2      923            850
+    ##  4  2013     1     1      544            545        -1     1004           1022
+    ##  5  2013     1     1      554            600        -6      812            837
+    ##  6  2013     1     1      554            558        -4      740            728
+    ##  7  2013     1     1      555            600        -5      913            854
+    ##  8  2013     1     1      557            600        -3      709            723
+    ##  9  2013     1     1      557            600        -3      838            846
+    ## 10  2013     1     1      558            600        -2      753            745
+    ## # ... with 336,766 more rows, and 11 more variables: arr_delay <dbl>,
+    ## #   carrier <chr>, flight <int>, tailnum <chr>, origin <chr>, dest <chr>,
+    ## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+
+`everything()` is a nice select helper, especially when you want to move
+a few columns to the front
+
+``` r
+flights %>% 
+  select(origin, everything())
+```
+
+    ## # A tibble: 336,776 x 19
+    ##    origin  year month   day dep_time sched_dep_time dep_delay arr_time
+    ##    <chr>  <int> <int> <int>    <int>          <int>     <dbl>    <int>
+    ##  1 EWR     2013     1     1      517            515         2      830
+    ##  2 LGA     2013     1     1      533            529         4      850
+    ##  3 JFK     2013     1     1      542            540         2      923
+    ##  4 JFK     2013     1     1      544            545        -1     1004
+    ##  5 LGA     2013     1     1      554            600        -6      812
+    ##  6 EWR     2013     1     1      554            558        -4      740
+    ##  7 EWR     2013     1     1      555            600        -5      913
+    ##  8 LGA     2013     1     1      557            600        -3      709
+    ##  9 JFK     2013     1     1      557            600        -3      838
+    ## 10 LGA     2013     1     1      558            600        -2      753
+    ## # ... with 336,766 more rows, and 11 more variables: sched_arr_time <int>,
+    ## #   arr_delay <dbl>, carrier <chr>, flight <int>, tailnum <chr>, dest <chr>,
+    ## #   air_time <dbl>, distance <dbl>, hour <dbl>, minute <dbl>, time_hour <dttm>
+
+## Exercises
 
 # mutate()
 
